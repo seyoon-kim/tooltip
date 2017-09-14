@@ -1,4 +1,6 @@
 var ToolTip = function(eleToolTip) {
+    this.delay = eleToolTip.delay || 0; // delay 값이 없다면 0으로 초기화
+
     var selectorName = eleToolTip.element;
     var contents = eleToolTip.contents;
     var eleSelectors = Domutil.querySelectorAll(selectorName);
@@ -14,20 +16,34 @@ var ToolTip = function(eleToolTip) {
 
 }
 
-var mytooltip = {
-    init : function (arrEle){
+var mytooltip = (function() {
+    var arrToolTip = [];
+
+    var init = function (arrEle){
         for (var i = 0; i < arrEle.length; i += 1) {
-            new ToolTip(arrEle[i]);
+            arrToolTip.push(new ToolTip(arrEle[i]));
+
         }
     }
-}
+
+    var getArrToolTip = function() {
+        return arrToolTip;
+    }
+
+    return {
+        init : init,
+        getArrToolTip : getArrToolTip
+    }
+
+})();
 
 describe("mytooltip.init", function() {
     beforeEach(function() {
         document.body.innerHTML = '<p>test... <strong id="first">consectetur</strong> blar... blar... blar... <strong class="second">ullamco</strong>blar... <strong class="second">ullamco 0202</strong>';
         mytooltip.init([{
             element: "#first",
-            contents: 'Duis aute irure dolor'
+            contents: 'Duis aute irure dolor',
+            delay: 500
         }, {
             element: ".second",
             contents: 'labore et dolore magna aliqua'
@@ -63,5 +79,12 @@ describe("mytooltip.init", function() {
         expect(eleToolTipText[0].innerText).toEqual('Duis aute irure dolor');
         expect(eleToolTipText[1].innerText).toEqual('labore et dolore magna aliqua');
         expect(eleToolTipText[2].innerText).toEqual('labore et dolore magna aliqua');
+    });
+
+    // .toolTipText 요소가 각각의 delay값을 가지고 있는지 확인
+    it("Each toolTipText should be equal each contents", function() {
+        var arrToolTip = mytooltip.getArrToolTip();
+        expect(arrToolTip[0].delay).toEqual(500);
+        expect(arrToolTip[1].delay).toEqual(0);
     });
 });
