@@ -156,5 +156,14 @@ describe("mytooltip.init", function() {
         expect(Domclass.hasClass(eleToolTipText, "on")).toBe(false);
     });
 
+    // .toolTipText 요소 위에 mouseout를 할 경우 안에 있는 toolTipText 요소에 'on' class를 제거하여 해당 요소가 보이지 않도록 한다.
+    it("If .toolTipText element mouseover, toolTipText should be have 'on' class", function() {
+        var arrToolTip = mytooltip.getArrToolTip();
+        var eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
+        arrToolTip[0].mouseoutToolTip(eleToolTipText);
+        eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
+        expect(Domclass.hasClass(eleToolTipText, "on")).toBe(false);
+    });
+
 
 });
