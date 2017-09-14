@@ -3,6 +3,42 @@
   <head>
     <meta charset="utf-8">
     <title>tooltip</title>
+    <style>
+      html, body, p, strong{
+        margin:0;
+        padding:0;
+      }
+
+      .toolTip{
+        position: relative;
+      }
+
+      .toolTipText{
+        z-index:10;
+        display: none;
+        position: absolute;
+
+        left: 0;
+        padding:5px;
+
+        width:100px;
+        height:20px;
+
+        color:#fff;
+        border-color:#000;
+        background-color: #d9d9d9;
+      }
+
+      .toolTipText.on{
+        display: block;
+      }
+
+      .my-img{
+        width:100px;
+        height:100px;
+        background-color:green;
+      }
+    </style>
   </head>
   <body>
 
