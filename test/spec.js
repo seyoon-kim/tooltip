@@ -22,12 +22,17 @@ ToolTip.prototype.addHandlerMouseoverToolTip = function(ele) {
     var that = this;
     Eventutil.addHandler(ele, "mouseover", function(e) {
         var target = e.target;
-        that.mouseoverToolTip(target)
+        that.mouseoverToolTip(target);
     });
 }
 
 ToolTip.prototype.mouseoverToolTip = function(target){
-    var eleToolTipText = target.querySelector(".toolTipText");
+    var eleToolTipText;
+    if (Domclass.hasClass(target, "toolTipText")) {
+        Domclass.addClass(target, "on");
+        return;
+    }
+    eleToolTipText = target.querySelector(".toolTipText");
     Domclass.addClass(eleToolTipText, "on");
 }
 
@@ -108,6 +113,15 @@ describe("mytooltip.init", function() {
         var eleFirst = Domutil.querySelectorAll("#first")[0];
         var eleToolTipText;
         arrToolTip[0].mouseoverToolTip(eleFirst);
+        eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
+        expect(Domclass.hasClass(eleToolTipText, "on")).toBe(true);
+    });
+
+    // .toolTipText 요소 위에 mouseover를 할 경우 안에 있는 toolTipText 요소에 'on' class를 추가하여 해당 요소가 노출되는지 확인
+    it("If .toolTipText element mouseover, toolTipText should be have 'on' class", function() {
+        var arrToolTip = mytooltip.getArrToolTip();
+        var eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
+        arrToolTip[0].mouseoverToolTip(eleToolTipText);
         eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
         expect(Domclass.hasClass(eleToolTipText, "on")).toBe(true);
     });
