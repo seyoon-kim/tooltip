@@ -14,6 +14,7 @@ var ToolTip = function(eleToolTip) {
         eleSelectors[i].appendChild(eleToolTipText);
 
         this.addHandlerMouseoverToolTip(eleSelectors[i]);
+        this.addHandlerMouseoutToolTip(eleSelectors[i]);
     }
 
 }
@@ -35,6 +36,25 @@ ToolTip.prototype.mouseoverToolTip = function(target){
     eleToolTipText = target.querySelector(".toolTipText");
     Domclass.addClass(eleToolTipText, "on");
 }
+
+ToolTip.prototype.addHandlerMouseoutToolTip = function(ele) {
+    var that = this;
+    Eventutil.addHandler(ele, "mouseout", function(e) {
+        var target = e.target;
+        that.mouseoutToolTip(target);
+    });
+}
+
+ToolTip.prototype.mouseoutToolTip = function(target){
+    var eleToolTipText;
+    if (Domclass.hasClass(target, "toolTipText")) {
+        Domclass.removeClass(target, "on");
+        return;
+    }
+    eleToolTipText = target.querySelector(".toolTipText");
+    Domclass.removeClass(eleToolTipText, "on");
+}
+
 
 var mytooltip = (function() {
     var arrToolTip = [];
@@ -125,4 +145,16 @@ describe("mytooltip.init", function() {
         eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
         expect(Domclass.hasClass(eleToolTipText, "on")).toBe(true);
     });
+
+    // .toolTip 요소 위에 mouseout을 할 경우 안에 있는 toolTipText 요소에 'on' class를 제거하여 해당 요소가 보이지 않도록 한다.
+    it("If .toolTip element mouseout, toolTipText should be have not 'on' class", function() {
+        var arrToolTip = mytooltip.getArrToolTip();
+        var eleFirst = Domutil.querySelectorAll("#first")[0];
+        var eleToolTipText;
+        arrToolTip[0].mouseoutToolTip(eleFirst);
+        eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
+        expect(Domclass.hasClass(eleToolTipText, "on")).toBe(false);
+    });
+
+
 });
