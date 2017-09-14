@@ -34,7 +34,15 @@ ToolTip.prototype.mouseoverToolTip = function(target){
         return;
     }
     eleToolTipText = target.querySelector(".toolTipText");
-    Domclass.addClass(eleToolTipText, "on");
+
+    // delay가 존재하는 경우 해당 시간이 흐른뒤 클래스 추가
+    if (this.delay === 0){
+        Domclass.addClass(eleToolTipText, "on");
+    }else{
+        setTimeout(function(){
+            Domclass.addClass(eleToolTipText, "on");
+        }, this.delay);
+    }
 }
 
 ToolTip.prototype.addHandlerMouseoutToolTip = function(ele) {
@@ -130,10 +138,10 @@ describe("mytooltip.init", function() {
     // .toolTip 요소 위에 mouseover를 할 경우 안에 있는 toolTipText 요소에 'on' class를 추가하여 해당 요소가 노출되는지 확인
     it("If .toolTip element mouseover, toolTipText should be have 'on' class", function() {
         var arrToolTip = mytooltip.getArrToolTip();
-        var eleFirst = Domutil.querySelectorAll("#first")[0];
+        var eleSecond = Domutil.querySelectorAll(".second")[0];
         var eleToolTipText;
-        arrToolTip[0].mouseoverToolTip(eleFirst);
-        eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
+        arrToolTip[1].mouseoverToolTip(eleSecond);
+        eleToolTipText = Domutil.querySelector(".second .toolTipText")[0];
         expect(Domclass.hasClass(eleToolTipText, "on")).toBe(true);
     });
 
@@ -165,5 +173,17 @@ describe("mytooltip.init", function() {
         expect(Domclass.hasClass(eleToolTipText, "on")).toBe(false);
     });
 
-
+    // .toolTip 요소 위에 mouseover를 할 경우 delay 500 속성값이 있을때 안에 있는 toolTipText 요소에 'on' class가 delay시간이 흐른 뒤 추가하여 해당 요소가 노출되는지 확인
+    it("If .toolTip element mouseover with delay 500 property, toolTipText should be have 'on' class", function() {
+        jasmine.clock().install();
+        var arrToolTip = mytooltip.getArrToolTip();
+        var eleFirst = Domutil.querySelectorAll("#first")[0];
+        var eleToolTipText;
+        arrToolTip[0].mouseoverToolTip(eleFirst);
+        eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
+        setTimeout(function() {
+            expect(Domclass.hasClass(eleToolTipText, "on")).toBe(true);
+        }, 500);
+        jasmine.clock().uninstall();
+    });
 });
