@@ -84,6 +84,12 @@ var mytooltip = (function() {
         }
     }
 
+    ToolTip.prototype.removeToolTip = function() {
+        for (var i = 0; i < this.arrToolTips.length; i += 1) {
+            this.arrToolTips[i].parentNode.replaceChild(this.eleSelectors[i], this.arrToolTips[i]);
+        }
+    }
+
     var init = function (arrEle){
         for (var i = 0; i < arrEle.length; i += 1) {
             arrToolTip.push(new ToolTip(arrEle[i]));
@@ -109,6 +115,17 @@ var mytooltip = (function() {
         arrToolTip.push(new ToolTip(objInfo));
     }
 
+    var remove = function(selector) {
+
+        for(var i = 0; i < arrToolTip.length; i += 1) {
+
+            if (arrToolTip[i].selectorName === selector) {
+                arrToolTip[i].removeToolTip();
+                arrToolTip.splice(i, 1);
+            }
+        }
+    }
+
     var getArrToolTip = function() {
         return arrToolTip;
     }
@@ -117,6 +134,7 @@ var mytooltip = (function() {
         init : init,
         edit : edit,
         add : add,
+        remove : remove,
         getArrToolTip : getArrToolTip
     }
 
@@ -306,5 +324,29 @@ describe("mytooltip.add", function() {
         var eleToolTip = Domutil.querySelectorAll("#first")[0].parentElement;
         var eleToolTipParent =  eleToolTip.parentElement;
         expect(Domclass.hasClass(eleToolTipParent, "toolTipText")).toBe(false);
+    });
+});
+
+fdescribe("mytooltip.add", function() {
+    beforeEach(function() {
+        document.body.innerHTML = '<p>test... <strong id="first">consectetur</strong> blar... blar... blar... <strong class="second">ullamco</strong>blar... <strong class="second">ullamco 0202</strong><p><img src="#" class="my-img" /></p>';
+        mytooltip.init([{
+            element: "#first",
+            contents: 'Duis aute irure dolor',
+            delay: 500
+        }, {
+            element: ".second",
+            contents: 'labore et dolore magna aliqua'
+        }]);
+
+        mytooltip.remove('.second');
+    });
+
+    // .second를 가진 요소들의 tooltip 해제
+    fit("parent of .second element should be have not tooltip element ", function() {
+        var eleToolTip = Domutil.querySelectorAll(".second")[0].parentElement;
+        expect(Domclass.hasClass(eleToolTip, "toolTip")).toBe(false);
+        var eleToolTipText = Domutil.querySelectorAll(".second")[0].nextSibling;
+        expect(eleToolTipText === '<div class="toolTipText">labore et dolore magna aliqua</div>').toBe(false);
     });
 });
