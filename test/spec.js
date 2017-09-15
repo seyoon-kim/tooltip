@@ -1,26 +1,28 @@
-
-
-
 var mytooltip = (function() {
     var arrToolTip = [];
 
-    var ToolTip = function(eleToolTip) {
-        this.delay = eleToolTip.delay || 0; // delay 값이 없다면 0으로 초기화
-        this.selectorName = eleToolTip.element;
-        this.contents = eleToolTip.contents;
-
+    var ToolTip = function(selector) {
+        this.delay = selector.delay || 0; // delay 값이 없다면 0으로 초기화
+        this.selectorName = selector.element;
+        this.contents = selector.contents;
         this.eleSelectors = Domutil.querySelectorAll(this.selectorName);
-        var eleToolTipText = null;
+        this.arrToolTips = [];
 
         for (var i = 0; i < this.eleSelectors.length; i += 1) {
-            Domclass.addClass(this.eleSelectors[i], "toolTip");
-            eleToolTipText = document.createElement("DIV");
+            // 새로운 ToolTip 생성 한후 기존의 요소 안에 삽입
+            var eleClone = this.eleSelectors[i].cloneNode(true);
+            var eleToolTip = document.createElement("DIV");
+            Domclass.addClass(eleToolTip, "toolTip");
+            eleToolTip.appendChild(eleClone);
+            var eleToolTipText = document.createElement("DIV");
             Domclass.addClass(eleToolTipText, "toolTipText");
             eleToolTipText.innerHTML = this.contents;
-            this.eleSelectors[i].appendChild(eleToolTipText);
+            eleToolTip.appendChild(eleToolTipText);
+            this.eleSelectors[i].parentNode.replaceChild(eleToolTip, this.eleSelectors[i]);
+            this.arrToolTips.push(eleToolTip);
 
-            this.addHandlerMouseoverToolTip(this.eleSelectors[i]);
-            this.addHandlerMouseoutToolTip(this.eleSelectors[i]);
+            this.addHandlerMouseoverToolTip(eleToolTip);
+            this.addHandlerMouseoutToolTip(eleToolTip);
         }
 
     }
@@ -37,17 +39,18 @@ var mytooltip = (function() {
         var eleToolTipText;
         if (Domclass.hasClass(target, "toolTipText")) {
             Domclass.addClass(target, "on");
-            return;
-        }
-        eleToolTipText = target.querySelector(".toolTipText");
-
-        // delay가 존재하는 경우 해당 시간이 흐른뒤 클래스 추가
-        if (this.delay === 0){
+        } else if (Domclass.hasClass(target, "toolTip")) {
+            var eleToolTipText = target.childNodes[1];
             Domclass.addClass(eleToolTipText, "on");
-        }else{
-            setTimeout(function(){
+        } else {
+            var eleToolTipText = target.nextSibling;
+            if(!this.delay){
                 Domclass.addClass(eleToolTipText, "on");
-            }, this.delay);
+            }else {
+                setTimeout(function(){
+                  Domclass.addClass(eleToolTipText, "on");
+                }, this.delay);
+            }
         }
     }
 
@@ -63,17 +66,21 @@ var mytooltip = (function() {
         var eleToolTipText;
         if (Domclass.hasClass(target, "toolTipText")) {
             Domclass.removeClass(target, "on");
-            return;
+        } else if (Domclass.hasClass(target, "toolTip")) {
+            var eleToolTipText = target.childNodes[1];
+            Domclass.removeClass(eleToolTipText, "on");
+        }else {
+            var eleToolTipText = target.nextSibling;
+            Domclass.removeClass(eleToolTipText, "on");
         }
-        eleToolTipText = target.querySelector(".toolTipText");
-        Domclass.removeClass(eleToolTipText, "on");
     }
 
     ToolTip.prototype.editInfo = function(objInfo) {
         this.contents = objInfo.contents;
         this.delay = objInfo.delay;
-        for(var i = 0; i < this.eleSelectors.length; i += 1) {
-            this.eleSelectors[i].childNodes[1].innerText = this.contents;
+
+        for(var i = 0; i < this.arrToolTips.length; i += 1) {
+            this.arrToolTips[i].childNodes[1].innerText = this.contents;
         }
     }
 
@@ -91,6 +98,11 @@ var mytooltip = (function() {
         }
     }
 
+    var add = function(selector, objInfo) {
+        objInfo.element = selector;
+        arrToolTip.push(new ToolTip(objInfo));
+    }
+
     var getArrToolTip = function() {
         return arrToolTip;
     }
@@ -98,6 +110,7 @@ var mytooltip = (function() {
     return {
         init : init,
         edit : edit,
+        add : add,
         getArrToolTip : getArrToolTip
     }
 
@@ -116,17 +129,17 @@ describe("mytooltip.init", function() {
         }]);
     });
 
-    // #first ID를 가진 엘리멘트에 toolTip Class가 제대로 추가 되었는지 확인하기.
+    // #first ID를 가진 엘리멘트의 부모 엘리멘트 toolTip에 해당 Class가 제대로 추가 되었는지 확인하기.
     it("should be have .toolTip", function() {
-        var eleFirst = Domutil.querySelectorAll("#first")[0];
-        expect(Domclass.hasClass(eleFirst, "toolTip")).toBe(true);
+        var eleToolTip = Domutil.querySelectorAll("#first")[0].parentElement;
+        expect(Domclass.hasClass(eleToolTip, "toolTip")).toBe(true);
     });
 
-    // .toolTip class를 가진 엘리멘트들이 각각 toolTip Class가 제대로 추가 되었는지 확인하기.
+    // .toolTip class를 가진 엘리멘트의 부모 엘리멘트 toolTip에 해당 Class가 제대로 추가 되었는지 확인하기.
     it("should be have each .toolTip class", function() {
         var eleSecond = Domutil.querySelectorAll(".second");
-        expect(Domclass.hasClass(eleSecond[0], "toolTip")).toBe(true);
-        expect(Domclass.hasClass(eleSecond[1], "toolTip")).toBe(true);
+        expect(Domclass.hasClass(eleSecond[0].parentElement, "toolTip")).toBe(true);
+        expect(Domclass.hasClass(eleSecond[1].parentElement, "toolTip")).toBe(true);
     });
 
     // .toolTip 요소안에 .toolTipText 요소가 제대로 생겼는지 확인하기
@@ -157,52 +170,62 @@ describe("mytooltip.init", function() {
     // .toolTip 요소 위에 mouseover를 할 경우 안에 있는 toolTipText 요소에 'on' class를 추가하여 해당 요소가 노출되는지 확인
     it("If .toolTip element mouseover, toolTipText should be have 'on' class", function() {
         var arrToolTip = mytooltip.getArrToolTip();
-        var eleSecond = Domutil.querySelectorAll(".second")[0];
+        var eleToolTip = Domutil.querySelectorAll(".second")[0].parentElement;
+
         var eleToolTipText;
-        arrToolTip[1].mouseoverToolTip(eleSecond);
-        eleToolTipText = Domutil.querySelector(".second .toolTipText")[0];
+        arrToolTip[1].mouseoverToolTip(eleToolTip);
+        eleToolTipText = eleToolTip.childNodes[1];
         expect(Domclass.hasClass(eleToolTipText, "on")).toBe(true);
     });
 
     // .toolTipText 요소 위에 mouseover를 할 경우 안에 있는 toolTipText 요소에 'on' class를 추가하여 해당 요소가 노출되는지 확인
     it("If .toolTipText element mouseover, toolTipText should be have 'on' class", function() {
         var arrToolTip = mytooltip.getArrToolTip();
-        var eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
+        var eleToolTip = Domutil.querySelectorAll("#first")[0].parentElement;
+        var eleToolTipText = eleToolTip.childNodes[1];
         arrToolTip[0].mouseoverToolTip(eleToolTipText);
-        eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
         expect(Domclass.hasClass(eleToolTipText, "on")).toBe(true);
     });
 
     // .toolTip 요소 위에 mouseout을 할 경우 안에 있는 toolTipText 요소에 'on' class를 제거하여 해당 요소가 보이지 않도록 한다.
     it("If .toolTip element mouseout, toolTipText should be have not 'on' class", function() {
         var arrToolTip = mytooltip.getArrToolTip();
-        var eleFirst = Domutil.querySelectorAll("#first")[0];
+        var eleToolTip = Domutil.querySelectorAll("#first")[0].parentElement;
         var eleToolTipText;
-        arrToolTip[0].mouseoutToolTip(eleFirst);
-        eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
+        arrToolTip[0].mouseoverToolTip(eleToolTip);
+        eleToolTipText = eleToolTip.childNodes[1];
+        expect(Domclass.hasClass(eleToolTipText, "on")).toBe(true);
+        arrToolTip[0].mouseoutToolTip(eleToolTip);
         expect(Domclass.hasClass(eleToolTipText, "on")).toBe(false);
     });
 
     // .toolTipText 요소 위에 mouseout를 할 경우 안에 있는 toolTipText 요소에 'on' class를 제거하여 해당 요소가 보이지 않도록 한다.
     it("If .toolTipText element mouseover, toolTipText should be have 'on' class", function() {
         var arrToolTip = mytooltip.getArrToolTip();
-        var eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
+        var eleToolTip = Domutil.querySelectorAll("#first")[0].parentElement;
+        var eleToolTipText = eleToolTip.childNodes[1];
+        arrToolTip[0].mouseoverToolTip(eleToolTipText);
+        expect(Domclass.hasClass(eleToolTipText, "on")).toBe(true);
         arrToolTip[0].mouseoutToolTip(eleToolTipText);
-        eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
         expect(Domclass.hasClass(eleToolTipText, "on")).toBe(false);
     });
 
     // .toolTip 요소 위에 mouseover를 할 경우 delay 500 속성값이 있을때 안에 있는 toolTipText 요소에 'on' class가 delay시간이 흐른 뒤 추가하여 해당 요소가 노출되는지 확인
-    it("If .toolTip element mouseover with delay 500 property, toolTipText should be have 'on' class", function() {
+    xit("If .toolTip element mouseover with delay 500 property, toolTipText should be have 'on' class", function(done) {
         jasmine.clock().install();
         var arrToolTip = mytooltip.getArrToolTip();
-        var eleFirst = Domutil.querySelectorAll("#first")[0];
+        var eleToolTip = Domutil.querySelectorAll("#first")[0].parentElement;
         var eleToolTipText;
-        arrToolTip[0].mouseoverToolTip(eleFirst);
-        eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
+        arrToolTip[0].mouseoverToolTip(eleToolTip);
+        eleToolTipText = eleToolTip.childNodes[1];
+
+        expect(Domclass.hasClass(eleToolTipText, "on")).toBe(false);
+
         setTimeout(function() {
             expect(Domclass.hasClass(eleToolTipText, "on")).toBe(true);
+            done()
         }, 500);
+
         jasmine.clock().uninstall();
     });
 });
@@ -221,13 +244,54 @@ describe("mytooltip.edit", function() {
 
         mytooltip.edit('#first', {
             contents: 'Lorem ipsum',
-            delay: 0
+            delay: 1000
         });
     });
 
-    // #first ID를 가진 요소의 toolTipText가 변경되었는지 확인
-    fit("should be change toolTipText", function() {
-        var eleToolTipText = Domutil.querySelector("#first .toolTipText")[0];
+    // #first ID를 가진 요소의 다음 엘리멘트 toolTipText의 innterText가 변경되었는지 확인
+    it("should be change text of toolTipText", function() {
+        var eleToolTip = Domutil.querySelectorAll("#first")[0].parentElement;
+        var eleToolTipText = eleToolTip.childNodes[1];
         expect(eleToolTipText.innerText).toEqual('Lorem ipsum');
+    });
+
+    // #first ID를 가진 요소의 다음 엘리멘트 toolTipText의 delay값이 1000으로 변경되었는지 확인
+    xit("should be change delay property of toolTipText", function() {
+        jasmine.clock().install();
+        var arrToolTip = mytooltip.getArrToolTip();
+        var eleToolTip = Domutil.querySelectorAll("#first")[0].parentElement;
+        var eleToolTipText;
+        arrToolTip[0].mouseoverToolTip(eleToolTip);
+        eleToolTipText = eleToolTip.childNodes[1];
+        setTimeout(function() {
+            expect(Domclass.hasClass(eleToolTipText, "on")).toBe(true);
+        }, 1000);
+        jasmine.clock().uninstall();
+    });
+});
+
+describe("mytooltip.add", function() {
+    beforeEach(function() {
+        document.body.innerHTML = '<p>test... <strong id="first">consectetur</strong> blar... blar... blar... <strong class="second">ullamco</strong>blar... <strong class="second">ullamco 0202</strong><p><img src="#" class="my-img" /></p>';
+        mytooltip.init([{
+            element: "#first",
+            contents: 'Duis aute irure dolor',
+            delay: 500
+        }, {
+            element: ".second",
+            contents: 'labore et dolore magna aliqua'
+        }]);
+
+        mytooltip.add('.my-img', {
+            contents: 'test image',
+            delay: 300
+        });
+    });
+
+    // my-img class를 가진 툴팁 객체를 추가할수 있는지 확인
+    it("should be have my-img class", function() {
+        var eleToolTip = Domutil.querySelectorAll(".my-img")[0].parentElement;
+        var eleToolTipText = eleToolTip.childNodes[1];
+        expect(Domclass.hasClass(eleToolTipText, "toolTipText")).toBe(true);
     });
 });
