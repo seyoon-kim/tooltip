@@ -99,6 +99,12 @@ var mytooltip = (function() {
     }
 
     var add = function(selector, objInfo) {
+        // 기존의 ToolTip과 같은 selector값을 가진 것이 있는지 중복 확인
+        for (var i = 0; i < arrToolTip.length; i +=1) {
+            if(arrToolTip[i].selectorName === selector){
+              return;
+            }
+        }
         objInfo.element = selector;
         arrToolTip.push(new ToolTip(objInfo));
     }
@@ -293,5 +299,12 @@ describe("mytooltip.add", function() {
         var eleToolTip = Domutil.querySelectorAll(".my-img")[0].parentElement;
         var eleToolTipText = eleToolTip.childNodes[1];
         expect(Domclass.hasClass(eleToolTipText, "toolTipText")).toBe(true);
+    });
+
+    // 기존의 #first tooltip이 있는 경우 다시 동일한 #first로 추가를 시도하면 추가되지 않도록 한다.
+    it("should be add not #first tooltip", function() {
+        var eleToolTip = Domutil.querySelectorAll("#first")[0].parentElement;
+        var eleToolTipParent =  eleToolTip.parentElement;
+        expect(Domclass.hasClass(eleToolTipParent, "toolTipText")).toBe(false);
     });
 });
