@@ -1,25 +1,40 @@
 var mytooltip = (function() {
-    var arrToolTipObj = [];
+    //var arrToolTipObj = [];
     var idSetTimeoutOfDelay = 0;
 
 
-    var ToolTip = function(eleObj) {
-      //console.log(eleObj)
-        this.selectorName = eleObj.element;
-        this.contents = eleObj.contents;
-        this.delay = eleObj.delay || 0;
+    // var ToolTip = function(eleObj) {
+    //   //console.log(eleObj)
+    //     this.selectorName = eleObj.element;
+    //     this.contents = eleObj.contents;
+    //     this.delay = eleObj.delay || 0;
+    //
+    //     var arrHasToolTip = Domutil.querySelectorAll(this.selectorName);
+    //
+    //     var i = 0;
+    //     var arrHasToolTipLength = arrHasToolTip.length;
+    //
+    //     for (; i < arrHasToolTipLength; i += 1) {
+    //          Domclass.addClass(arrHasToolTip[i], "toolTip");
+    //          arrHasToolTip[i].setAttribute("data-contents", this.contents);
+    //
+    //          arrHasToolTip[i].setAttribute("data-delay", this.delay);
+    //
+    //     }
+    // }
 
-        var arrHasToolTip = Domutil.querySelectorAll(this.selectorName);
+    var _makeToolTip = function(eleObj) {
+        var selectorName = eleObj.element;
+        var contents = eleObj.contents;
+        var delay = eleObj.delay || 0;
+        var arrHasToolTip = Domutil.querySelectorAll(selectorName);
 
         var i = 0;
         var arrHasToolTipLength = arrHasToolTip.length;
-
         for (; i < arrHasToolTipLength; i += 1) {
              Domclass.addClass(arrHasToolTip[i], "toolTip");
-             arrHasToolTip[i].setAttribute("data-contents", this.contents);
-
-             arrHasToolTip[i].setAttribute("data-delay", this.delay);
-
+             arrHasToolTip[i].setAttribute("data-contents", contents);
+             arrHasToolTip[i].setAttribute("data-delay", delay);
         }
     }
 
@@ -105,17 +120,19 @@ var mytooltip = (function() {
     }
 
     var init = function(arrEleObj) {
+      console.log("!")
         var i = 0;
         var arrEleObjLength = arrEleObj.length;
 
         for (; i < arrEleObjLength; i += 1) {
-            arrToolTipObj.push(new ToolTip(arrEleObj[i]));
+            _makeToolTip(arrEleObj[i]);
         }
 
         _addEventToolTip();
     };
 
     var edit = function(selector, objInfo) {
+
         var arrToolTip = Domutil.querySelectorAll(selector);
         for (var i = 0; i < arrToolTip.length; i += 1) {
             if (objInfo.delay) {
@@ -128,10 +145,27 @@ var mytooltip = (function() {
         }
     }
 
+    var add = function(selector, objInfo) {
+        var arrEleObj = [{
+            "element" : selector
+        }];
+
+        if(objInfo.contents){
+          arrEleObj[0].contents = objInfo.contents;
+        }
+
+        if(objInfo.delay){
+          arrEleObj[0].delay = objInfo.delay;
+        }
+
+        _makeToolTip(arrEleObj[0]);
+    }
+
 
     return {
         init: init,
         edit: edit,
+        add: add,
 
         _addToolTipText: _addToolTipText,
         _removeToolTipText: _removeToolTipText

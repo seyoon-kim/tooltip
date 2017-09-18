@@ -55,7 +55,7 @@ describe('mytooltip.init', function() {
     });
 });
 
-describe('mytooltip.init', function() {
+describe('mytooltip.edit', function() {
     beforeEach(function() {
         document.body.innerHTML = '<p>test... <strong id="first">consectetur</strong> blar... blar... blar... <strong class="second">ullamco</strong>blar... <strong class="second">ullamco 0202</strong>';
         mytooltip.init([{
@@ -82,5 +82,30 @@ describe('mytooltip.init', function() {
         jasmine.clock().tick(1000);
         expect(Domutil.querySelector('.toolTipText').length).toBe(1);
         jasmine.clock().uninstall();
+    });
+});
+
+describe('mytooltip.add', function() {
+    beforeEach(function() {
+        document.body.innerHTML = '<p>test... <strong id="first">consectetur</strong> blar... blar... blar... <strong class="second">ullamco</strong>blar... <strong class="second">ullamco 0202</strong><p><img src="#" class="my-img" /></p>';
+        mytooltip.init([{
+            element: '#first',
+            contents: 'Duis aute irure dolor',
+            delay: 500
+        }, {
+            element: '.second',
+            contents: 'labore et dolore magna aliqua'
+        }]);
+
+        mytooltip.add('.my-img', {
+            contents: 'test image',
+            delay: 1000
+        });
+    });
+
+    // add함수를 이용해 해당하는 엘리멘트 요소를 toolTip으로 추가한다.
+    it('If mouseover, toolTip ele append toolTipText element after changed delay', function() {
+        var eleMyImg = Domutil.querySelectorAll('.my-img')[0];
+        expect(Domclass.hasClass(eleMyImg, 'toolTip')).toBe(true);
     });
 });
