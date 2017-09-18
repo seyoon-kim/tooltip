@@ -1,4 +1,24 @@
 var mytooltip = (function() {
+    var arrToolTipObj = [];
+
+
+    var ToolTip = function(eleObj) {
+      //console.log(eleObj)
+        this.selectorName = eleObj.element;
+        this.contents = eleObj.contents
+
+        var arrHasToolTip = Domutil.querySelectorAll(this.selectorName);
+
+        var i = 0;
+        var arrHasToolTipLength = arrHasToolTip.length;
+
+        for (; i < arrHasToolTipLength; i += 1) {
+             Domclass.addClass(arrHasToolTip[i], "toolTip");
+             arrHasToolTip[i].setAttribute("data-contents", this.contents)
+        }
+    }
+
+
     var _addEventToolTip = function() {
         _addEventToolTipMouseOver();
         _addEventToolTipMouseOut();
@@ -13,15 +33,16 @@ var mytooltip = (function() {
             target = e.target || e.srcElement;
 
             if (Domclass.hasClass(target, "toolTip")) {
-                _addToolTipText();
+                _addToolTipText(target);
             }
         });
     }
 
-    var _addToolTipText = function() {
+    var _addToolTipText = function(target) {
         var eleBody = document.body;
         var eleToolTipText = document.createElement("DIV");
         Domclass.addClass(eleToolTipText, "toolTipText");
+        eleToolTipText.innerText = target.getAttribute("data-contents");
         eleBody.appendChild(eleToolTipText);
     }
 
@@ -47,18 +68,17 @@ var mytooltip = (function() {
     }
 
     var init = function(arrEleObj) {
+        var i = 0;
+        var arrEleObjLength = arrEleObj.length;
 
-        for (var numArrEleObj = 0; numArrEleObj < arrEleObj.length; numArrEleObj += 1) {
-            var eleName = arrEleObj[numArrEleObj].element;
-            var arrFounded = Domutil.querySelectorAll(eleName);
-            var arrFoundedLength = arrFounded.length;
-
-            for (var numArrFounded = 0; numArrFounded < arrFoundedLength; numArrFounded += 1) {
-                 Domclass.addClass(arrFounded[numArrFounded], "toolTip");
-            }
+        for (; i < arrEleObjLength; i += 1) {
+            //console.log(arrEleObj[i])
+            arrToolTipObj.push(new ToolTip(arrEleObj[i]));
         }
+        //console.log(arrToolTipObj)
 
         _addEventToolTip();
+
     };
 
 
