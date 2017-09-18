@@ -54,3 +54,33 @@ describe('mytooltip.init', function() {
         jasmine.clock().uninstall();
     });
 });
+
+describe('mytooltip.init', function() {
+    beforeEach(function() {
+        document.body.innerHTML = '<p>test... <strong id="first">consectetur</strong> blar... blar... blar... <strong class="second">ullamco</strong>blar... <strong class="second">ullamco 0202</strong>';
+        mytooltip.init([{
+            element: '#first',
+            contents: 'Duis aute irure dolor',
+            delay: 500
+        }, {
+            element: '.second',
+            contents: 'labore et dolore magna aliqua'
+        }]);
+
+        mytooltip.edit('#first', {
+            contents: 'Lorem ipsum',
+            delay: 1000
+        });
+    });
+
+    // edit함수를 이용해 해당 내용을 변경 후, toolTip class를 가지고 있는 요소 mouseover 할 경우 body 태그의 toolTiptex가 변경 delay만큼 이후에 나타나는가 확인
+    it('If mouseover, toolTip ele append toolTipText element after changed delay', function() {
+        jasmine.clock().install();
+        var eleFirst = Domutil.querySelectorAll('#first')[0];
+        mytooltip._addToolTipText(eleFirst);
+        expect(Domutil.querySelector('.toolTipText').length).toBe(0);
+        jasmine.clock().tick(1000);
+        expect(Domutil.querySelector('.toolTipText').length).toBe(1);
+        jasmine.clock().uninstall();
+    });
+});

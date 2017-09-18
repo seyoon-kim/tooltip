@@ -66,7 +66,6 @@ var mytooltip = (function() {
 
         var targetDelay = target.getAttribute("data-delay");
 
-
         if(targetDelay > 0){
             idSetTimeoutOfDelay = setTimeout(function (){
                 eleBody.appendChild(eleToolTipText);
@@ -116,9 +115,23 @@ var mytooltip = (function() {
         _addEventToolTip();
     };
 
+    var edit = function(selector, objInfo) {
+        var arrToolTip = Domutil.querySelectorAll(selector);
+        for (var i = 0; i < arrToolTip.length; i += 1) {
+            if (objInfo.delay) {
+                arrToolTip[i].setAttribute("data-delay", objInfo.delay);
+            }
+
+            if (objInfo.contents) {
+                arrToolTip[i].setAttribute("data-contents", objInfo.contents);
+            }
+        }
+    }
+
 
     return {
         init: init,
+        edit: edit,
 
         _addToolTipText: _addToolTipText,
         _removeToolTipText: _removeToolTipText
