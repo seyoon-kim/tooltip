@@ -18,4 +18,10 @@ describe('mytooltip.init', function() {
         expect(Domclass.hasClass(eleFirst, 'toolTip')).toBe(true);
         expect(Domclass.hasClass(eleSecond, 'toolTip')).toBe(true);
     });
+
+    // toolTip class를 가지고 있는 요소에 mouseover 할 경우 body태그에 toolTipText를 만들어 추가 하였는지 확인
+    it('If mouseover, body append toolTipText element', function() {
+        mytooltip._showToolTipText();
+        expect(Domutil.querySelector('.toolTipText').length).toBe(1);
+    });
 });
