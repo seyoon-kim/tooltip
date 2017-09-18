@@ -158,34 +158,23 @@ var Domutil = (function() {
     };
 })();
 
-// https://jaketrent.com/post/addremove-classes-raw-javascript/ 참고
 var Domclass = (function() {
     var hasClass = function (el, className) {
-        if (el.classList){
-            return el.classList.contains(className);
-        }
-        else{
-            return !!el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+        var result = el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+        if(result){
+          return true;
+        }else{
+          return false;
         }
     };
 
     var addClass = function (el, className) {
-        if (el.classList){
-            el.classList.add(className);
-        }
-        else if (!hasClass(el, className)) {
-            el.className += " " + className;
-        }
+        el.className += " " + className;
     };
 
     var removeClass = function (el, className) {
-        if (el.classList) {
-            el.classList.remove(className);
-        }
-        else if (hasClass(el, className)) {
-            var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-            el.className=el.className.replace(reg, ' ');
-        }
+        var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+        el.className=el.className.replace(reg, ' ');
     };
 
     return {
