@@ -1,11 +1,13 @@
 var mytooltip = (function() {
     var arrToolTipObj = [];
+    var idSetTimeoutOfDelay = 0;
 
 
     var ToolTip = function(eleObj) {
       //console.log(eleObj)
         this.selectorName = eleObj.element;
-        this.contents = eleObj.contents
+        this.contents = eleObj.contents;
+        this.delay = eleObj.delay || 0;
 
         var arrHasToolTip = Domutil.querySelectorAll(this.selectorName);
 
@@ -14,7 +16,10 @@ var mytooltip = (function() {
 
         for (; i < arrHasToolTipLength; i += 1) {
              Domclass.addClass(arrHasToolTip[i], "toolTip");
-             arrHasToolTip[i].setAttribute("data-contents", this.contents)
+             arrHasToolTip[i].setAttribute("data-contents", this.contents);
+
+             arrHasToolTip[i].setAttribute("data-delay", this.delay);
+
         }
     }
 
@@ -31,6 +36,9 @@ var mytooltip = (function() {
         Eventutil.addHandler(eleBody, "mouseover", function(e){
             e = e || window.event;
             target = e.target || e.srcElement;
+
+
+            clearTimeout(idSetTimeoutOfDelay);
 
             if (Domclass.hasClass(target, "toolTip")) {
                 _addToolTipText(target);
@@ -56,8 +64,19 @@ var mytooltip = (function() {
         eleToolTipText.style.top = (targetTop + targetHeight) + 'px';
         eleToolTipText.style.display = 'block';
 
+        var targetDelay = target.getAttribute("data-delay");
 
-        eleBody.appendChild(eleToolTipText);
+
+        if(targetDelay > 0){
+            idSetTimeoutOfDelay = setTimeout(function (){
+                eleBody.appendChild(eleToolTipText);
+                return;
+            }, targetDelay)
+        } else {
+
+            eleBody.appendChild(eleToolTipText);
+        }
+
     }
 
 
@@ -68,10 +87,12 @@ var mytooltip = (function() {
         Eventutil.addHandler(eleBody, "mouseout", function(e){
             e = e || window.event;
             target = e.target || e.srcElement;
+
+            clearTimeout(idSetTimeoutOfDelay);
+
             if (Domclass.hasClass(target, "toolTipText")) {
                 _removeToolTipText();
             }
-
         });
     }
 
@@ -93,7 +114,6 @@ var mytooltip = (function() {
         }
 
         _addEventToolTip();
-
     };
 
 

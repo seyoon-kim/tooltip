@@ -21,25 +21,36 @@ describe('mytooltip.init', function() {
 
     // toolTip class를 가지고 있는 요소에 mouseover 할 경우 body태그에 toolTipText를 만들어 추가 하였는지 확인
     it('If mouseover, body append toolTipText element', function() {
-        var eleFirst = Domutil.querySelectorAll('#first')[0];
-        mytooltip._addToolTipText(eleFirst);
+        var eleSecond = Domutil.querySelectorAll('.second')[0];
+        mytooltip._addToolTipText(eleSecond);
         expect(Domutil.querySelector('.toolTipText').length).toBe(1);
     });
 
     // toolTip class를 가지고 있는 요소에 mouseout 할 경우 body태그의 toolTipText 를 제거하였는지 확인
     it('If mouseout, body remove toolTipText element', function() {
-        var eleFirst = Domutil.querySelectorAll('#first')[0];
-        mytooltip._addToolTipText(eleFirst);
+        var eleSecond = Domutil.querySelectorAll('.second')[0];
+        mytooltip._addToolTipText(eleSecond);
         expect(Domutil.querySelector('.toolTipText').length).toBe(1);
-        mytooltip._removeToolTipText(eleFirst);
+        mytooltip._removeToolTipText(eleSecond);
         expect(Domutil.querySelector('.toolTipText').length).toBe(0);
     });
 
     // toolTip class를 가지고 있는 요소의 data-contents값과 mouseover 할 경우 body 태그의 toolTiptex의 innerText 값이 같은지 확인
     it('If mouseover, data-contents of toolTip ele be equal InnerText of toolTipText element', function() {
+        var eleSecond = Domutil.querySelectorAll('.second')[0];
+        mytooltip._addToolTipText(eleSecond);
+        var eleToolTipText = Domutil.querySelector('.toolTipText')[0];
+        expect(eleToolTipText.innerText).toEqual(eleSecond.getAttribute('data-contents'));
+    });
+
+    // toolTip class를 가지고 있는 요소 mouseover 할 경우 body 태그의 toolTiptex가 delay만큼 이후에 나타나는가 확인
+    it('If mouseover, toolTip ele append toolTipText element after delay', function() {
+        jasmine.clock().install();
         var eleFirst = Domutil.querySelectorAll('#first')[0];
         mytooltip._addToolTipText(eleFirst);
-        var eleToolTipText = Domutil.querySelector('.toolTipText')[0];
-        expect(eleToolTipText.innerText).toEqual(eleFirst.getAttribute('data-contents'));
+        expect(Domutil.querySelector('.toolTipText').length).toBe(0);
+        jasmine.clock().tick(500);
+        expect(Domutil.querySelector('.toolTipText').length).toBe(1);
+        jasmine.clock().uninstall();
     });
 });
