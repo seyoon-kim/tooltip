@@ -1,6 +1,7 @@
 var mytooltip = (function() {
     var _addEventToolTip = function() {
         _addEventToolTipMouseOver();
+        _addEventToolTipMouseOut();
     }
 
     var _addEventToolTipMouseOver = function() {
@@ -12,16 +13,37 @@ var mytooltip = (function() {
             target = e.target || e.srcElement;
 
             if (Domclass.hasClass(target, "toolTip")) {
-                _showToolTipText();
+                _addToolTipText();
             }
         });
     }
 
-    var _showToolTipText = function() {
+    var _addToolTipText = function() {
         var eleBody = document.body;
         var eleToolTipText = document.createElement("DIV");
         Domclass.addClass(eleToolTipText, "toolTipText");
         eleBody.appendChild(eleToolTipText);
+    }
+
+
+    var _addEventToolTipMouseOut = function() {
+        var eleBody = document.body;
+        var self = this;
+        var target;
+        Eventutil.addHandler(eleBody, "mouseout", function(e){
+            e = e || window.event;
+            target = e.target || e.srcElement;
+
+            if (Domclass.hasClass(target, "toolTip")) {
+                _removeToolTipText();
+            }
+        });
+    }
+
+    var _removeToolTipText = function() {
+        var eleBody = document.body;
+        var eleToolTipText = Domutil.querySelector(".toolTipText")[0];
+        eleBody.removeChild(eleToolTipText);
     }
 
     var init = function(arrEleObj) {
@@ -42,6 +64,8 @@ var mytooltip = (function() {
 
     return {
         init: init,
-        _showToolTipText: _showToolTipText
+
+        _addToolTipText: _addToolTipText,
+        _removeToolTipText: _removeToolTipText
     };
 })();

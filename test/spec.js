@@ -21,7 +21,15 @@ describe('mytooltip.init', function() {
 
     // toolTip class를 가지고 있는 요소에 mouseover 할 경우 body태그에 toolTipText를 만들어 추가 하였는지 확인
     it('If mouseover, body append toolTipText element', function() {
-        mytooltip._showToolTipText();
+        mytooltip._addToolTipText();
         expect(Domutil.querySelector('.toolTipText').length).toBe(1);
+    });
+
+    // toolTip class를 가지고 있는 요소에 mouseout 할 경우 body태그의 toolTipText 를 제거하였는지 확인
+    it('If mouseover, body append toolTipText element', function() {
+        mytooltip._addToolTipText();
+        expect(Domutil.querySelector('.toolTipText').length).toBe(1);
+        mytooltip._removeToolTipText();
+        expect(Domutil.querySelector('.toolTipText').length).toBe(0);
     });
 });
