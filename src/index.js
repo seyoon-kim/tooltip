@@ -1,28 +1,6 @@
 var mytooltip = (function() {
-    //var arrToolTipObj = [];
     var idSetTimeoutOfDelay = 0;
-
-
-    // var ToolTip = function(eleObj) {
-    //   //console.log(eleObj)
-    //     this.selectorName = eleObj.element;
-    //     this.contents = eleObj.contents;
-    //     this.delay = eleObj.delay || 0;
-    //
-    //     var arrHasToolTip = Domutil.querySelectorAll(this.selectorName);
-    //
-    //     var i = 0;
-    //     var arrHasToolTipLength = arrHasToolTip.length;
-    //
-    //     for (; i < arrHasToolTipLength; i += 1) {
-    //          Domclass.addClass(arrHasToolTip[i], "toolTip");
-    //          arrHasToolTip[i].setAttribute("data-contents", this.contents);
-    //
-    //          arrHasToolTip[i].setAttribute("data-delay", this.delay);
-    //
-    //     }
-    // }
-
+    
     var _makeToolTip = function(eleObj) {
         var selectorName = eleObj.element;
         var contents = eleObj.contents;
@@ -120,7 +98,6 @@ var mytooltip = (function() {
     }
 
     var init = function(arrEleObj) {
-      console.log("!")
         var i = 0;
         var arrEleObjLength = arrEleObj.length;
 
@@ -161,11 +138,21 @@ var mytooltip = (function() {
         _makeToolTip(arrEleObj[0]);
     }
 
+    var remove = function(selector) {
+        var arrEle = Domutil.querySelectorAll(selector);
+        for (var i = 0; i < arrEle.length; i += 1) {
+            Domclass.removeClass(arrEle[i], "toolTip");
+            arrEle[i].removeAttribute("data-delay");
+            arrEle[i].removeAttribute("data-contents");
+        }
+    }
+
 
     return {
         init: init,
         edit: edit,
         add: add,
+        remove: remove,
 
         _addToolTipText: _addToolTipText,
         _removeToolTipText: _removeToolTipText

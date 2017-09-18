@@ -109,3 +109,26 @@ describe('mytooltip.add', function() {
         expect(Domclass.hasClass(eleMyImg, 'toolTip')).toBe(true);
     });
 });
+
+
+describe('mytooltip.add', function() {
+    beforeEach(function() {
+        document.body.innerHTML = '<p>test... <strong id="first">consectetur</strong> blar... blar... blar... <strong class="second">ullamco</strong>blar... <strong class="second">ullamco 0202</strong><p><img src="#" class="my-img" /></p>';
+        mytooltip.init([{
+            element: '#first',
+            contents: 'Duis aute irure dolor',
+            delay: 500
+        }, {
+            element: '.second',
+            contents: 'labore et dolore magna aliqua'
+        }]);
+
+        mytooltip.remove('#first');
+    });
+
+    // remove함수로 해당 셀렉터에 해당하는 요소의 toolTip class를 제거한다.
+    it('If mouseover, toolTip ele append toolTipText element after changed delay', function() {
+        var eleFirst = Domutil.querySelectorAll('#first')[0];
+        expect(Domclass.hasClass(eleFirst, 'toolTip')).toBe(false);
+    });
+});
