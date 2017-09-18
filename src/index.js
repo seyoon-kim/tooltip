@@ -34,6 +34,10 @@ var mytooltip = (function() {
 
             if (Domclass.hasClass(target, "toolTip")) {
                 _addToolTipText(target);
+            } else if (Domclass.hasClass(target, "toolTipText")) {
+                return;
+            } else {
+                _removeToolTipText();
             }
         });
     }
@@ -43,6 +47,16 @@ var mytooltip = (function() {
         var eleToolTipText = document.createElement("DIV");
         Domclass.addClass(eleToolTipText, "toolTipText");
         eleToolTipText.innerText = target.getAttribute("data-contents");
+        var targetLeft = target.offsetLeft;
+        var targetTop = target.offsetTop;
+        var targetHeight = target.offsetHeight - 2;
+
+
+        eleToolTipText.style.left = targetLeft + 'px';
+        eleToolTipText.style.top = (targetTop + targetHeight) + 'px';
+        eleToolTipText.style.display = 'block';
+
+
         eleBody.appendChild(eleToolTipText);
     }
 
@@ -54,16 +68,19 @@ var mytooltip = (function() {
         Eventutil.addHandler(eleBody, "mouseout", function(e){
             e = e || window.event;
             target = e.target || e.srcElement;
-
-            if (Domclass.hasClass(target, "toolTip")) {
+            if (Domclass.hasClass(target, "toolTipText")) {
                 _removeToolTipText();
             }
+
         });
     }
 
     var _removeToolTipText = function() {
         var eleBody = document.body;
         var eleToolTipText = Domutil.querySelector(".toolTipText")[0];
+        if (!eleToolTipText) {
+            return;
+        }
         eleBody.removeChild(eleToolTipText);
     }
 
@@ -72,10 +89,8 @@ var mytooltip = (function() {
         var arrEleObjLength = arrEleObj.length;
 
         for (; i < arrEleObjLength; i += 1) {
-            //console.log(arrEleObj[i])
             arrToolTipObj.push(new ToolTip(arrEleObj[i]));
         }
-        //console.log(arrToolTipObj)
 
         _addEventToolTip();
 
