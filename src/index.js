@@ -8,7 +8,7 @@ var mytooltip = (function() {
     var getArrToolTip;
 
     var ToolTip = function(selector) {
-        this.delay = selector.delay || 0; // delay 값이 없다면 0으로 초기화
+        this.delay = selector.delay || 0;
         this.selectorName = selector.element;
         this.contents = selector.contents;
         this.eleSelectors = Domutil.querySelectorAll(this.selectorName);
@@ -25,7 +25,6 @@ var mytooltip = (function() {
         var eleSelectorsLength = this.eleSelectors.length;
 
         for (; i < eleSelectorsLength; i += 1) {
-            // 새로운 ToolTip 생성 한후 기존의 요소 안에 삽입
             eleClone = this.eleSelectors[i].cloneNode(true);
             eleToolTip = this.makeEleToolTip(eleClone);
             this.makeEleToolTipText(eleToolTip);
@@ -154,7 +153,6 @@ var mytooltip = (function() {
     };
 
     add = function(selector, objInfo) {
-        // 기존의 ToolTip과 같은 selector값을 가진 것이 있는지 중복 확인
         var i = 0;
         var arrToolTipLength = arrToolTip.length;
 

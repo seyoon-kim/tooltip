@@ -93,10 +93,10 @@ describe('mytooltip.init', function() {
 
     // .toolTip 요소 위에 mouseover를 할 경우 delay 500 속성값이 있을때 안에 있는 toolTipText 요소에 'on' class가 delay시간이 흐른 뒤 추가하여 해당 요소가 노출되는지 확인
     it("If .toolTip element mouseover with delay 500 property, toolTipText should be have 'on' class", function() {
-        jasmine.clock().install();
         var arrToolTip = mytooltip.getArrToolTip();
         var eleSecond = Domutil.querySelectorAll('#first')[0];
         var eleToolTipText;
+        jasmine.clock().install();
         arrToolTip[0].mouseoverToolTip(eleSecond);
         eleToolTipText = eleSecond.nextSibling;
         expect(Domclass.hasClass(eleToolTipText, 'on')).toBe(false);
@@ -133,10 +133,10 @@ describe('mytooltip.edit', function() {
 
     // #first ID를 가진 요소의 다음 엘리멘트 toolTipText의 delay값이 1000으로 변경되었는지 확인
     it('should be change delay property of toolTipText', function() {
-        jasmine.clock().install();
         var arrToolTip = mytooltip.getArrToolTip();
         var eleFirst = Domutil.querySelectorAll('#first')[0];
         var eleToolTipText;
+        jasmine.clock().install();
         arrToolTip[0].mouseoverToolTip(eleFirst);
         eleToolTipText = eleFirst.nextSibling;
         expect(Domclass.hasClass(eleToolTipText, 'on')).toBe(false);
@@ -197,8 +197,8 @@ describe('mytooltip.remove', function() {
     // .second를 가진 요소들의 tooltip 해제
     it('parent of .second element should be have not tooltip element ', function() {
         var eleToolTip = Domutil.querySelectorAll('.second')[0].parentElement;
-        expect(Domclass.hasClass(eleToolTip, 'toolTip')).toBe(false);
         var eleToolTipText = Domutil.querySelectorAll('.second')[0].nextSibling;
+        expect(Domclass.hasClass(eleToolTip, 'toolTip')).toBe(false);
         expect(eleToolTipText === '<div class="toolTipText">labore et dolore magna aliqua</div>').toBe(false);
     });
 });
