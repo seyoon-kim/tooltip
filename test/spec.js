@@ -38,15 +38,16 @@ describe('mytooltip.init', function() {
     // toolTip class를 가지고 있는 요소의 data-contents값과 mouseover 할 경우 body 태그의 toolTiptex의 innerText 값이 같은지 확인
     it('If mouseover, data-contents of toolTip ele be equal InnerText of toolTipText element', function() {
         var eleSecond = Domutil.querySelectorAll('.second')[0];
+        var eleToolTipText;
         mytooltip._addToolTipText(eleSecond);
-        var eleToolTipText = Domutil.querySelector('.toolTipText')[0];
+        eleToolTipText = Domutil.querySelector('.toolTipText')[0];
         expect(eleToolTipText.innerText).toEqual(eleSecond.getAttribute('data-contents'));
     });
 
     // toolTip class를 가지고 있는 요소 mouseover 할 경우 body 태그의 toolTiptex가 delay만큼 이후에 나타나는가 확인
     it('If mouseover, toolTip ele append toolTipText element after delay', function() {
-        jasmine.clock().install();
         var eleFirst = Domutil.querySelectorAll('#first')[0];
+        jasmine.clock().install();
         mytooltip._addToolTipText(eleFirst);
         expect(Domutil.querySelector('.toolTipText').length).toBe(0);
         jasmine.clock().tick(500);
@@ -75,8 +76,8 @@ describe('mytooltip.edit', function() {
 
     // edit함수를 이용해 해당 내용을 변경 후, toolTip class를 가지고 있는 요소 mouseover 할 경우 body 태그의 toolTiptex가 변경 delay만큼 이후에 나타나는가 확인
     it('If mouseover, toolTip ele append toolTipText element after changed delay', function() {
-        jasmine.clock().install();
         var eleFirst = Domutil.querySelectorAll('#first')[0];
+        jasmine.clock().install();
         mytooltip._addToolTipText(eleFirst);
         expect(Domutil.querySelector('.toolTipText').length).toBe(0);
         jasmine.clock().tick(1000);
@@ -109,7 +110,6 @@ describe('mytooltip.add', function() {
         expect(Domclass.hasClass(eleMyImg, 'toolTip')).toBe(true);
     });
 });
-
 
 describe('mytooltip.add', function() {
     beforeEach(function() {
