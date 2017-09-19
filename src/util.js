@@ -56,28 +56,28 @@ var Domutil = (function() {
     // from에 있는 요소 중에 중복되어 있는 요소를 제거한 배열을 반환
     var _removeSameElement = function(from) {
         var temp = [];
-        var x;
-        var y;
+        var numFrom;
+        var numTemp;
         var count;
         var fromLength;
         var tempLength;
 
-        x = 0;
+        numFrom = 0;
         fromLength = from.length;
-        for (x; x < fromLength; x += 1) {
-            if (x === 0) {
+        for (numFrom; numFrom < fromLength; numFrom += 1) {
+            if (numFrom === 0) {
                 temp.push(from[0]);
             } else {
                 count = 0;
-                y = 0;
+                numTemp = 0;
                 tempLength = temp.length;
-                for (y; y < tempLength; y += 1) {
-                    if (temp[y] === from[x]) {
+                for (numTemp; numTemp < tempLength; numTemp += 1) {
+                    if (temp[numTemp] === from[numFrom]) {
                         count += 1;
                     }
                 }
                 if (count === 0) {
-                    temp.push(from[x]);
+                    temp.push(from[numFrom]);
                 }
             }
         }
@@ -158,40 +158,26 @@ var Domutil = (function() {
     };
 })();
 
-// https://jaketrent.com/post/addremove-classes-raw-javascript/ 참고
 var Domclass = (function() {
-    var hasClass = function (el, className) {
-        if (el.classList){
-            return el.classList.contains(className);
-        }
-        else{
-            return !!el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
-        }
+    var hasClass = function(el, className) {
+        var result = el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+
+        return !!result;
     };
 
-    var addClass = function (el, className) {
-        if (el.classList){
-            el.classList.add(className);
-        }
-        else if (!hasClass(el, className)) {
-            el.className += " " + className;
-        }
+    var addClass = function(el, className) {
+        el.className += ' ' + className;
     };
 
-    var removeClass = function (el, className) {
-        if (el.classList) {
-            el.classList.remove(className);
-        }
-        else if (hasClass(el, className)) {
-            var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-            el.className=el.className.replace(reg, ' ');
-        }
+    var removeClass = function(el, className) {
+        var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+        el.className = el.className.replace(reg, ' ');
     };
 
     return {
-      hasClass : hasClass,
-      addClass : addClass,
-      removeClass : removeClass
+        hasClass: hasClass,
+        addClass: addClass,
+        removeClass: removeClass
     };
 })();
 
@@ -201,9 +187,9 @@ var Eventutil = (function() {
         if (element.addEventListener) {
             element.addEventListener(type, handler, false);
         } else if (element.attachEvent) {
-            element.attachEvent("on" + type, handler);
+            element.attachEvent('on' + type, handler);
         } else {
-            element["on" + type] = handler;
+            element['on' + type] = handler;
         }
     };
 
@@ -211,14 +197,14 @@ var Eventutil = (function() {
         if (element.removeEventListener) {
             element.removeEventListener(type, handler, false);
         } else if (element.detachEvent) {
-            element.detachEvent("on" + type, handler);
+            element.detachEvent('on' + type, handler);
         } else {
-            element["on" + type] = null;
+            element['on' + type] = null;
         }
     };
 
     return {
-        addHandler : addHandler,
-        removeHandler : removeHandler
+        addHandler: addHandler,
+        removeHandler: removeHandler
     };
 })();
