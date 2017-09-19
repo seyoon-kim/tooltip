@@ -86,18 +86,22 @@
         });
 
         mytooltip.edit('.second', {
-            contents: 'Lorem ipsum test test test'
+            contents: 'Lorem ipsum test test test',
+            delay:1000
         });
 
+        mytooltip.edit('.second', {
+            contents: '세번째',
+            delay:0
+        });
 
         mytooltip.edit('.secondddd', {
             contents: 'Lorem ipsum test test test',
-            delay: 1000
+            delay: 0
         });
 
         mytooltip.add('.my-img', {
-            contents: 'test image',
-            delay: 1000
+            contents: 'test image'
         });
 
         mytooltip.remove('.second');

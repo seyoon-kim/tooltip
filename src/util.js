@@ -163,11 +163,6 @@ var Domclass = (function() {
         var result = el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
 
         return !!result;
-        // if(result){
-        //   return true;
-        // }else{
-        //   return false;
-        // }
     };
 
     var addClass = function(el, className) {

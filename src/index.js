@@ -1,16 +1,18 @@
 var mytooltip = (function() {
     var idSetTimeoutOfDelay = 0;
 
-    var _makeToolTip = function(eleObj) {
+    var _setToolTipData = function(eleObj) {
         var selectorName = eleObj.element;
-        var contents = eleObj.contents;
+        var contents = eleObj.contents || '';
         var delay = eleObj.delay || 0;
         var arrHasToolTip = Domutil.querySelectorAll(selectorName);
 
         var i = 0;
         var arrHasToolTipLength = arrHasToolTip.length;
         for (; i < arrHasToolTipLength; i += 1) {
-            Domclass.addClass(arrHasToolTip[i], 'toolTip');
+            if (!Domclass.hasClass(arrHasToolTip[i], 'toolTip')) {
+                Domclass.addClass(arrHasToolTip[i], 'toolTip');
+            }
             arrHasToolTip[i].setAttribute('data-contents', contents);
             arrHasToolTip[i].setAttribute('data-delay', delay);
         }
@@ -23,12 +25,13 @@ var mytooltip = (function() {
         var targetTop = target.offsetTop;
         var targetHeight = target.offsetHeight - 2;
         var targetDelay = target.getAttribute('data-delay');
+        var eleToolTipTextStyle = eleToolTipText.style;
 
         Domclass.addClass(eleToolTipText, 'toolTipText');
         eleToolTipText.innerText = target.getAttribute('data-contents');
-        eleToolTipText.style.left = targetLeft + 'px';
-        eleToolTipText.style.top = (targetTop + targetHeight) + 'px';
-        eleToolTipText.style.display = 'block';
+        eleToolTipTextStyle.left = targetLeft + 'px';
+        eleToolTipTextStyle.top = (targetTop + targetHeight) + 'px';
+        eleToolTipTextStyle.display = 'block';
 
         if (targetDelay > 0) {
             idSetTimeoutOfDelay = setTimeout(function() {
@@ -40,92 +43,66 @@ var mytooltip = (function() {
     };
 
     var _removeToolTipText = function() {
-        var eleBody = document.body;
         var eleToolTipText = Domutil.querySelector('.toolTipText')[0];
         if (!eleToolTipText) {
             return;
         }
-        eleBody.removeChild(eleToolTipText);
+        document.body.removeChild(eleToolTipText);
     };
 
-    var _addEventToolTipMouseOver = function() {
-        var eleBody = document.body;
+    var _addEventToolTipMouseOver = function(e) {
         var target;
-        Eventutil.addHandler(eleBody, 'mouseover', function(e) {
-            e = e || window.event;
-            target = e.target || e.srcElement;
+        e = e || window.event;
+        target = e.target || e.srcElement;
 
-            clearTimeout(idSetTimeoutOfDelay);
+        clearTimeout(idSetTimeoutOfDelay);
 
-            if (Domclass.hasClass(target, 'toolTip')) {
-                _addToolTipText(target);
-            } else if (Domclass.hasClass(target, 'toolTipText')) {
-                return;
-            } else {
-                _removeToolTipText();
-            }
-        });
+        if (Domclass.hasClass(target, 'toolTip')) {
+            _addToolTipText(target);
+        } else if (Domclass.hasClass(target, 'toolTipText')) {
+
+        } else {
+            _removeToolTipText();
+        }
     };
 
-    var _addEventToolTipMouseOut = function() {
-        var eleBody = document.body;
+    var _addEventToolTipMouseOut = function(e) {
         var target;
-        Eventutil.addHandler(eleBody, 'mouseout', function(e) {
-            e = e || window.event;
-            target = e.target || e.srcElement;
+        e = e || window.event;
+        target = e.target || e.srcElement;
 
-            clearTimeout(idSetTimeoutOfDelay);
+        clearTimeout(idSetTimeoutOfDelay);
 
-            if (Domclass.hasClass(target, 'toolTipText')) {
-                _removeToolTipText();
-            }
-        });
-    };
-
-    var _addEventToolTip = function() {
-        _addEventToolTipMouseOver();
-        _addEventToolTipMouseOut();
+        if (Domclass.hasClass(target, 'toolTipText')) {
+            _removeToolTipText();
+        }
     };
 
     var init = function(arrEleObj) {
         var i = 0;
         var arrEleObjLength = arrEleObj.length;
         for (; i < arrEleObjLength; i += 1) {
-            _makeToolTip(arrEleObj[i]);
+            _setToolTipData(arrEleObj[i]);
         }
 
-        _addEventToolTip();
+        Eventutil.addHandler(document.body, 'mouseover', _addEventToolTipMouseOver);
+        Eventutil.addHandler(document.body, 'mouseout', _addEventToolTipMouseOut);
     };
 
     var edit = function(selector, objInfo) {
-        var arrToolTip = Domutil.querySelectorAll(selector);
-        var i = 0;
-        var arrToolTipLength = arrToolTip.length;
-        for (; i < arrToolTipLength; i += 1) {
-            if (objInfo.delay) {
-                arrToolTip[i].setAttribute('data-delay', objInfo.delay);
-            }
-
-            if (objInfo.contents) {
-                arrToolTip[i].setAttribute('data-contents', objInfo.contents);
-            }
-        }
+        _setToolTipData({
+            'element': selector,
+            'contents': objInfo.contents,
+            'delay': objInfo.delay
+        });
     };
 
     var add = function(selector, objInfo) {
-        var arrEleObj = [{
-            'element': selector
-        }];
-
-        if (objInfo.contents) {
-            arrEleObj[0].contents = objInfo.contents;
-        }
-
-        if (objInfo.delay) {
-            arrEleObj[0].delay = objInfo.delay;
-        }
-
-        _makeToolTip(arrEleObj[0]);
+        _setToolTipData({
+            'element': selector,
+            'contents': objInfo.contents,
+            'delay': objInfo.delay
+        });
     };
 
     var remove = function(selector) {
