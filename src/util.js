@@ -1,53 +1,77 @@
 var Domutil = (function() {
+
+    var _toArray = function(likeArray) {
+        var result = [];
+        var i = 0;
+        var likeArrayLength = likeArray.length;
+
+        for (; i < likeArrayLength; i += 1) {
+            result.push(likeArray[i]);
+        }
+
+        return result;
+    };
+
+    var _indexOf = function(arr, obj) {
+        var i = 0;
+        var arrLength = arr.length;
+
+        for (; i < arrLength; i += 1) {
+            if (arr[i] === obj) {
+                return i;
+            }
+        }
+
+        return -1;
+    };
+
     // getElementsByClassName*() IE 8 이하 버전 호환
     var _getElementsByClassNamePolyfill = function(rootEle, selector) {
-        var allElements;
         var result = [];
-        var rClassName;
+        var allElements;
+        var testClassName;
         var i;
         var allElementsLength;
 
         if (document.getElementsByClassName) {
-            return rootEle.getElementsByClassName(selector);
+            return _toArray(rootEle.getElementsByClassName(selector));
         }
 
         allElements = rootEle.getElementsByTagName('*');
-        rClassName = new RegExp(selector);
+        testClassName = new RegExp(selector);
 
         i = 0;
         allElementsLength = allElements.length;
-        for (i; i < allElementsLength; i += 1) {
-            if (rClassName.test(allElements[i].className)) {
+        for (; i < allElementsLength; i += 1) {
+            if (testClassName.test(allElements[i].className)) {
                 result.push(allElements[i]);
             }
         }
 
         return result;
     };
-    /*
-     * 1. selector의 앞에 문자열에 따라 id, class, tagName을 구별하여 해당하는 엘리멘트들의 배열을 반환하는 함수
-     * 2. rootEle, selector 두 개의 인자를 받는다. rootEle는 이전에 받은 결과값으로서 해당 값으로 다시 다음번째의 selector 값을 이용하여 값을 찾을때 사용한다.
+
+    /**
+     * selector의 앞에 문자열에 따라 id, class, tagName을 구별하여 해당하는 엘리멘트들의 배열을 반환하는 함수
+     * @param {object} rootEle 는 이전에 받은 결과값으로서 해당 값으로 다시 다음번째의 selector 값을 이용하여 값을 찾을때 사용한다.
+     * @param {string} selectors 검색해야하는 selector 값
+     * @returns {array} result 는 해당 selector에 의해 검색되어진 결과값 배열
      */
     var _findElementsOfMatchingSelector = function(rootEle, selectors) {
         var result = [];
-        var rClassName = /^\./g;
-        var rIdName = /^#/g;
+        var rMatchedClassName = /^\./g;
+        var rMatchedIdName = /^#/g;
 
-        if (rClassName.test(selectors)) {
-            selectors = selectors.replace(rClassName, '');
+        if (rMatchedClassName.test(selectors)) {
+            selectors = selectors.replace(rMatchedClassName, '');
             result = _getElementsByClassNamePolyfill(rootEle, selectors);
-            result = Array.prototype.slice.call(result);
-        } else if (rIdName.test(selectors)) {
-            selectors = selectors.replace(rIdName, '');
+        } else if (rMatchedIdName.test(selectors)) {
+            selectors = selectors.replace(rMatchedIdName, '');
             result = document.getElementById(selectors);
-            if (result === null) {
-                result = [];
-            } else {
-                result = [result];
-            }
+            result = (result === null) ? [] : [result];
         } else {
             result = rootEle.getElementsByTagName(selectors);
-            result = Array.prototype.slice.call(result);
+            result = _toArray(result);
         }
 
         return result;
@@ -56,29 +80,16 @@ var Domutil = (function() {
     // from에 있는 요소 중에 중복되어 있는 요소를 제거한 배열을 반환
     var _removeSameElement = function(from) {
         var temp = [];
-        var x;
-        var y;
-        var count;
-        var fromLength;
-        var tempLength;
+        var numFrom = 0;
+        var fromLength = from.length;
 
-        x = 0;
-        fromLength = from.length;
-        for (x; x < fromLength; x += 1) {
-            if (x === 0) {
+        for (; numFrom < fromLength; numFrom += 1) {
+            if (numFrom === 0) {
                 temp.push(from[0]);
+            } else if (_indexOf(temp, from[numFrom]) > -1) {
+                break;
             } else {
-                count = 0;
-                y = 0;
-                tempLength = temp.length;
-                for (y; y < tempLength; y += 1) {
-                    if (temp[y] === from[x]) {
-                        count += 1;
-                    }
-                }
-                if (count === 0) {
-                    temp.push(from[x]);
-                }
+                temp.push(from[numFrom]);
             }
         }
 
@@ -87,12 +98,12 @@ var Domutil = (function() {
 
     // selector를 만족 시키는 요소들을 담은 배열을 생성하여 반환
     var _makeArrayMatchingToSelctor = function(selectors) {
-        var founded; // founded, from 중에서 arrSeletor의 원소에 해당하는 결과를 저장하는 값
-        var from; // from, 찾아야 하는 대상이 되는 엘리멘트
-        var arrSeletor; // arrSeletor, 무엇을 찾아야 하는지 알려주는 값
+        var founded = []; // founded, from 중에서 arrSeletor의 원소에 해당하는 결과를 저장하는 값
+        var from = [document]; // from, 찾아야 하는 대상이 되는 엘리멘트
         var result = [];
-        var i;
-        var j;
+        var arrSeletor;
+        var numArrSelector;
+        var numFrom;
         var arrSeletorLength;
         var fromLength;
 
@@ -100,17 +111,14 @@ var Domutil = (function() {
             return [];
         }
 
-        founded = [];
-        from = [document];
-        arrSeletor = selectors.split(' ');
-
-        i = 0;
+        arrSeletor = selectors.split(/\s+/);
+        numArrSelector = 0;
         arrSeletorLength = arrSeletor.length;
-        for (i; i < arrSeletorLength; i += 1) {
-            j = 0;
+        for (; numArrSelector < arrSeletorLength; numArrSelector += 1) {
+            numFrom = 0;
             fromLength = from.length;
-            for (j; j < fromLength; j += 1) {
-                founded = founded.concat(_findElementsOfMatchingSelector(from[j], arrSeletor[i]));
+            for (; numFrom < fromLength; numFrom += 1) {
+                founded = founded.concat(_findElementsOfMatchingSelector(from[numFrom], arrSeletor[numArrSelector]));
             }
 
             from = founded;
@@ -158,40 +166,26 @@ var Domutil = (function() {
     };
 })();
 
-// https://jaketrent.com/post/addremove-classes-raw-javascript/ 참고
 var Domclass = (function() {
-    var hasClass = function (el, className) {
-        if (el.classList){
-            return el.classList.contains(className);
-        }
-        else{
-            return !!el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
-        }
+    var hasClass = function(el, className) {
+        var result = el.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
+
+        return !!result;
     };
 
-    var addClass = function (el, className) {
-        if (el.classList){
-            el.classList.add(className);
-        }
-        else if (!hasClass(el, className)) {
-            el.className += " " + className;
-        }
+    var addClass = function(el, className) {
+        el.className += ' ' + className;
     };
 
-    var removeClass = function (el, className) {
-        if (el.classList) {
-            el.classList.remove(className);
-        }
-        else if (hasClass(el, className)) {
-            var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
-            el.className=el.className.replace(reg, ' ');
-        }
+    var removeClass = function(el, className) {
+        var reg = new RegExp('(\\s|^)' + className + '(\\s|$)');
+        el.className = el.className.replace(reg, ' ');
     };
 
     return {
-      hasClass : hasClass,
-      addClass : addClass,
-      removeClass : removeClass
+        hasClass: hasClass,
+        addClass: addClass,
+        removeClass: removeClass
     };
 })();
 
@@ -201,9 +195,9 @@ var Eventutil = (function() {
         if (element.addEventListener) {
             element.addEventListener(type, handler, false);
         } else if (element.attachEvent) {
-            element.attachEvent("on" + type, handler);
+            element.attachEvent('on' + type, handler);
         } else {
-            element["on" + type] = handler;
+            element['on' + type] = handler;
         }
     };
 
@@ -211,14 +205,14 @@ var Eventutil = (function() {
         if (element.removeEventListener) {
             element.removeEventListener(type, handler, false);
         } else if (element.detachEvent) {
-            element.detachEvent("on" + type, handler);
+            element.detachEvent('on' + type, handler);
         } else {
-            element["on" + type] = null;
+            element['on' + type] = null;
         }
     };
 
     return {
-        addHandler : addHandler,
-        removeHandler : removeHandler
+        addHandler: addHandler,
+        removeHandler: removeHandler
     };
 })();
