@@ -119,7 +119,6 @@ var Domutil = (function() {
             fromLength = from.length;
             for (; numFrom < fromLength; numFrom += 1) {
                 founded = founded.concat(_findElementsOfMatchingSelector(from[numFrom], arrSeletor[numArrSelector]));
-                //console.log(founded)
             }
 
             from = founded;
