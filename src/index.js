@@ -6,13 +6,10 @@ var mytooltip = (function() {
         var contents = eleObj.contents || '';
         var delay = eleObj.delay || 0;
         var arrHasToolTip = Domutil.querySelectorAll(selectorName);
-        //console.log(eleObj)
 
         var i = 0;
         var arrHasToolTipLength = arrHasToolTip.length;
         for (; i < arrHasToolTipLength; i += 1) {
-            //console.log(arrHasToolTip[i].className)
-
             if (!Domclass.hasClass(arrHasToolTip[i], 'toolTip')) {
                 Domclass.addClass(arrHasToolTip[i], 'toolTip');
             }
